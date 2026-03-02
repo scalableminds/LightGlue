@@ -7,4 +7,4 @@ from .lightglue import LightGlue  # noqa
 from .sift import SIFT  # noqa
 from .utils import match_pair  # noqa
 
-PRETRAINED_MODEL_WEIGHTS_PATH = resources.files('lightglue.weights')
+PRETRAINED_MODEL_WEIGHTS_PATH = resources.files('lightglue.pretrained_weights')
