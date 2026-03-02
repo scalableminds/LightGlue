@@ -31,4 +31,4 @@ profile = "black"
 
 
 [tool.setuptools.package-data]
-"*" = ["*.pth"]
+lightglue = ["**/*.pth"]

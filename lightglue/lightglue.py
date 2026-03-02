@@ -20,7 +20,7 @@ else:
 
 torch.backends.cudnn.deterministic = True
 
-from . import PRETRAINED_MODEL_WEIGHTS_PATH
+from .constants import PRETRAINED_MODEL_WEIGHTS_PATH
 
 
 AMP_CUSTOM_FWD_F32 = (

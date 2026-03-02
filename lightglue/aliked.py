@@ -43,7 +43,7 @@ from torch.nn.modules.utils import _pair
 from torchvision.models import resnet
 
 from .utils import Extractor, ImagePreprocessor
-from . import PRETRAINED_MODEL_WEIGHTS_PATH
+from .constants import PRETRAINED_MODEL_WEIGHTS_PATH
 
 
 def get_patches(
@@ -684,7 +684,9 @@ class ALIKED(Extractor):
             ),
         )
 
-        state_dict = torch.load(PRETRAINED_MODEL_WEIGHTS_PATH.joinpath(f"{conf.model_name}.pth"), map_location="cpu"
+        state_dict = torch.load(
+            PRETRAINED_MODEL_WEIGHTS_PATH.joinpath(f"{conf.model_name}.pth"),
+            map_location="cpu",
         )
         self.load_state_dict(state_dict, strict=True)
 
