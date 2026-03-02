@@ -1,7 +1,7 @@
 [project]
 name = "lightglue"
 description = "LightGlue: Local Feature Matching at Light Speed"
-version = "0.0"
+version = "0.2.0"
 authors = [
     {name = "Philipp Lindenberger"},
     {name = "Paul-Edouard Sarlin"},
@@ -14,7 +14,7 @@ classifiers = [
     "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
 ]
-urls = {Repository = "https://github.com/cvg/LightGlue/"}
+urls = {Repository = "https://github.com/scalableminds/LightGlue/"}
 dynamic = ["dependencies"]
 
 [project.optional-dependencies]
@@ -28,3 +28,7 @@ dependencies = {file = ["requirements.txt"]}
 
 [tool.isort]
 profile = "black"
+
+
+[tool.setuptools.package-data]
+"*" = ["*.pth"]

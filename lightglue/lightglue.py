@@ -20,6 +20,8 @@ else:
 
 torch.backends.cudnn.deterministic = True
 
+from . import PRETRAINED_MODEL_WEIGHTS_PATH
+
 
 AMP_CUSTOM_FWD_F32 = (
     torch.amp.custom_fwd(cast_inputs=torch.float32, device_type="cuda")
@@ -418,10 +420,8 @@ class LightGlue(nn.Module):
 
         state_dict = None
         if features is not None:
-            fname = f"{conf.weights}_{self.version.replace('.', '-')}.pth"
-            state_dict = torch.hub.load_state_dict_from_url(
-                self.url.format(self.version, self.conf.weights),
-                file_name=fname,
+            state_dict = torch.load(
+                PRETRAINED_MODEL_WEIGHTS_PATH.joinpath(f"{conf.weights}.pth")
             )
             self.load_state_dict(state_dict, strict=False)
         elif conf.weights is not None:

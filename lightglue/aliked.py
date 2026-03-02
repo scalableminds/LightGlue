@@ -43,6 +43,7 @@ from torch.nn.modules.utils import _pair
 from torchvision.models import resnet
 
 from .utils import Extractor, ImagePreprocessor
+from . import PRETRAINED_MODEL_WEIGHTS_PATH
 
 
 def get_patches(
@@ -228,9 +229,7 @@ class DKD(nn.Module):
                     keypoints_xy.view(1, 1, -1, 2),
                     mode="bilinear",
                     align_corners=True,
-                )[
-                    0, 0, 0, :
-                ]  # CxN
+                )[0, 0, 0, :]  # CxN
 
                 keypoints.append(keypoints_xy)
                 scoredispersitys.append(scoredispersity)
@@ -251,9 +250,7 @@ class DKD(nn.Module):
                     keypoints_xy.view(1, 1, -1, 2),
                     mode="bilinear",
                     align_corners=True,
-                )[
-                    0, 0, 0, :
-                ]  # CxN
+                )[0, 0, 0, :]  # CxN
                 keypoints.append(keypoints_xy)
                 scoredispersitys.append(kptscore)  # for jit.script compatability
                 kptscores.append(kptscore)
@@ -617,8 +614,6 @@ class ALIKED(Extractor):
         "nms_radius": 2,
     }
 
-    checkpoint_url = "https://github.com/Shiaoming/ALIKED/raw/main/models/{}.pth"
-
     n_limit_max = 20000
 
     # c1, c2, c3, c4, dim, K, M
@@ -689,8 +684,7 @@ class ALIKED(Extractor):
             ),
         )
 
-        state_dict = torch.hub.load_state_dict_from_url(
-            self.checkpoint_url.format(conf.model_name), map_location="cpu"
+        state_dict = torch.load(PRETRAINED_MODEL_WEIGHTS_PATH.joinpath(f"{conf.model_name}.pth"), map_location="cpu"
         )
         self.load_state_dict(state_dict, strict=True)
 
