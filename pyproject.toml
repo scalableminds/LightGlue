@@ -1,5 +1,5 @@
 [project]
-name = "lightglue"
+name = "scm-lightglue"
 description = "LightGlue: Local Feature Matching at Light Speed"
 version = "0.2.2"
 authors = [
@@ -21,7 +21,7 @@ dynamic = ["dependencies"]
 dev = ["black==23.12.1", "flake8", "isort"]
 
 [tool.setuptools]
-packages = ["lightglue"]
+packages = ["scm_lightglue"]
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
@@ -31,4 +31,4 @@ profile = "black"
 
 
 [tool.setuptools.package-data]
-lightglue = ["**/*.pth"]
+scm_lightglue = ["**/*.pth"]

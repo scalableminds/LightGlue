@@ -9,8 +9,8 @@ import numpy as np
 import torch
 import torch._dynamo
 
-from lightglue import LightGlue, SuperPoint
-from lightglue.utils import load_image
+from scm_lightglue import LightGlue, SuperPoint
+from scm_lightglue.utils import load_image
 
 torch.set_grad_enabled(False)
 
