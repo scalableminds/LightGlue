@@ -1,4 +1,5 @@
 import kornia
+from kornia.feature.disk.disk import DISK as KorniaDISK
 import torch
 
 from .utils import Extractor
@@ -24,7 +25,7 @@ class DISK(Extractor):
 
     def __init__(self, **conf) -> None:
         super().__init__(**conf)  # Update with default configuration.
-        self.model = load_from_pretrained(self.conf.weights)
+        self.model = load_from_pretrained(checkpoint=self.conf.weights)
 
     def forward(self, data: dict) -> dict:
         """Compute keypoints, scores, descriptors for image"""
@@ -55,10 +56,9 @@ class DISK(Extractor):
             "descriptors": descriptors.to(image).contiguous(),
         }
 
-
 def load_from_pretrained(
-    cls, checkpoint: str = "depth", device: torch.device = torch.device("cpu")
-) -> DISK:
+    checkpoint: str = "depth", device: torch.device = torch.device("cpu")
+) -> KorniaDISK:
     r"""Loads a pretrained model.
 
     Depth model was trained using depth map supervision and is slightly more precise but biased to detect keypoints
@@ -83,7 +83,7 @@ def load_from_pretrained(
 
     pretrained_dict = torch.load(urls[checkpoint], map_location=device)
 
-    model: DISK = cls().to(device)
+    model: KorniaDISK = KorniaDISK().to(device)
     model.load_state_dict(pretrained_dict["extractor"])
     model.eval()
     return model
