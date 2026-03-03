@@ -4,36 +4,6 @@ import torch
 from .utils import Extractor
 from .constants import PRETRAINED_MODEL_WEIGHTS_PATH
 
-def load_from_pretrained(cls, checkpoint: str = 'depth', device: torch.device = torch.device('cpu')) -> DISK:
-    r"""Loads a pretrained model.
-
-    Depth model was trained using depth map supervision and is slightly more precise but biased to detect keypoints
-    only where SfM depth is available. Epipolar model was trained using epipolar geometry supervision and
-    is less precise but detects keypoints everywhere where they are matchable. The difference is especially
-    pronounced on thin structures and on edges of objects.
-
-    Args:
-        checkpoint: The checkpoint to load. One of 'depth' or 'epipolar'.
-        device: The device to load the model to.
-
-    Returns:
-        The pretrained model.
-    """
-    urls = {
-        'depth': PRETRAINED_MODEL_WEIGHTS_PATH.joinpath("disk-depth-save.pth"),
-        'epipolar': PRETRAINED_MODEL_WEIGHTS_PATH.joinpath("disk-epipolar-save.pth")
-    }
-
-    if checkpoint not in urls:
-        raise ValueError(f'Unknown pretrained model: {checkpoint}')
-
-    pretrained_dict = torch.load(urls[checkpoint], map_location=device)
-
-    model: DISK = cls().to(device)
-    model.load_state_dict(pretrained_dict['extractor'])
-    model.eval()
-    return model
-
 
 class DISK(Extractor):
     default_conf = {
@@ -84,3 +54,36 @@ class DISK(Extractor):
             "keypoint_scores": scores.to(image).contiguous(),
             "descriptors": descriptors.to(image).contiguous(),
         }
+
+
+def load_from_pretrained(
+    cls, checkpoint: str = "depth", device: torch.device = torch.device("cpu")
+) -> DISK:
+    r"""Loads a pretrained model.
+
+    Depth model was trained using depth map supervision and is slightly more precise but biased to detect keypoints
+    only where SfM depth is available. Epipolar model was trained using epipolar geometry supervision and
+    is less precise but detects keypoints everywhere where they are matchable. The difference is especially
+    pronounced on thin structures and on edges of objects.
+
+    Args:
+        checkpoint: The checkpoint to load. One of 'depth' or 'epipolar'.
+        device: The device to load the model to.
+
+    Returns:
+        The pretrained model.
+    """
+    urls = {
+        "depth": PRETRAINED_MODEL_WEIGHTS_PATH.joinpath("disk-depth-save.pth"),
+        "epipolar": PRETRAINED_MODEL_WEIGHTS_PATH.joinpath("disk-epipolar-save.pth"),
+    }
+
+    if checkpoint not in urls:
+        raise ValueError(f"Unknown pretrained model: {checkpoint}")
+
+    pretrained_dict = torch.load(urls[checkpoint], map_location=device)
+
+    model: DISK = cls().to(device)
+    model.load_state_dict(pretrained_dict["extractor"])
+    model.eval()
+    return model
