@@ -1,7 +1,7 @@
 [project]
 name = "scm-lightglue"
 description = "LightGlue: Local Feature Matching at Light Speed"
-version = "0.2.3"
+version = "0.2.4"
 authors = [
     {name = "Philipp Lindenberger"},
     {name = "Paul-Edouard Sarlin"},
