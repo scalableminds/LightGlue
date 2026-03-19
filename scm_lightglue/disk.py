@@ -75,7 +75,6 @@ def load_from_pretrained(
     """
     urls = {
         "depth": PRETRAINED_MODEL_WEIGHTS_PATH.joinpath("disk-depth-save.pth"),
-        "epipolar": PRETRAINED_MODEL_WEIGHTS_PATH.joinpath("disk-epipolar-save.pth"),
     }
 
     if checkpoint not in urls:
