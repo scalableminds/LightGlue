@@ -1,3 +1,4 @@
+import urllib.request
 import warnings
 from pathlib import Path
 from types import SimpleNamespace
@@ -348,7 +349,7 @@ class LightGlue(nn.Module):
     required_data_keys = ["image0", "image1"]
 
     version = "v0.1_arxiv"
-    url = "https://github.com/cvg/LightGlue/releases/download/{}/{}.pth"
+    url = "http://static.voxelytics.com/misc/lightglue/{}/{}.pth"
 
     features = {
         "superpoint": {
@@ -420,9 +421,15 @@ class LightGlue(nn.Module):
 
         state_dict = None
         if features is not None:
-            state_dict = torch.load(
-                PRETRAINED_MODEL_WEIGHTS_PATH.joinpath(f"{conf.weights}.pth")
-            )
+            weights_path = PRETRAINED_MODEL_WEIGHTS_PATH.joinpath(f"{conf.weights}.pth")
+            # Due to pypi.org size constraints, we cannot ship all weights in the package
+            # If we do not find the weights file in the package, we load it from the internet.
+            if not weights_path.is_file():
+                weights_path.parent.mkdir(parents=True, exist_ok=True)
+                url = self.url.format(self.version, conf.weights)
+                print(f"Downloading weights from {url} ...")
+                urllib.request.urlretrieve(url, weights_path)
+            state_dict = torch.load(weights_path)
             self.load_state_dict(state_dict, strict=False)
         elif conf.weights is not None:
             path = Path(__file__).parent
