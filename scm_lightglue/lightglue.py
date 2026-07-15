@@ -349,7 +349,7 @@ class LightGlue(nn.Module):
     required_data_keys = ["image0", "image1"]
 
     version = "v0.1_arxiv"
-    url = "http://static.voxelytics.com/misc/lightglue/{}/{}.pth"
+    url = "https://static.voxelytics.com/misc/lightglue/{}/{}.pth"
 
     features = {
         "superpoint": {
