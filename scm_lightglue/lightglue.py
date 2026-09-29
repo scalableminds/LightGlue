@@ -420,7 +420,7 @@ class LightGlue(nn.Module):
 
         state_dict = None
         if features is not None:
-            state_dict = torch.load(self.download_weights(features))
+            state_dict = torch.load(self.get_weights_path(features))
             self.load_state_dict(state_dict, strict=False)
         elif conf.weights is not None:
             path = Path(__file__).parent
@@ -440,11 +440,11 @@ class LightGlue(nn.Module):
         self.static_lengths = None
 
     @classmethod
-    def download_weights(cls, features: str) -> Path:
+    def get_weights_path(cls, features: str) -> Path:
         """Returns the path to the weights for `features`, downloading them if needed.
 
         Call this once before starting multiple processes that share the torch hub
-        cache, so that the weights are downloaded only once.
+        cache, so that missing weights are downloaded only once.
         """
         weights = cls.features[features]["weights"]
         weights_path = Path(PRETRAINED_MODEL_WEIGHTS_PATH.joinpath(f"{weights}.pth"))
@@ -460,8 +460,9 @@ class LightGlue(nn.Module):
             weights_path.parent.mkdir(parents=True, exist_ok=True)
             url = cls.url.format(cls.version, weights)
             print(f"Downloading weights from {url} ...")
-            # Writes to a temporary file and renames it once complete, so that
-            # concurrent processes never load a partially written file.
+            # download_url_to_file downloads into a temporary file and renames it to
+            # weights_path once complete, so concurrent processes may download in
+            # parallel but never load a partially written file.
             torch.hub.download_url_to_file(url, str(weights_path), progress=False)
         return weights_path
 

@@ -4,4 +4,4 @@ If you are interested in LightGlue it might make sense to refer to the original 
 Use at your own risk!
 
 Weights that are not shipped with the package (e.g. LightGlue for SIFT) are downloaded on first use into the torch hub cache (`torch.hub.get_dir()`, configurable via `TORCH_HOME`).
-To download them only once for multiple processes that share this cache (e.g. on a cluster), call `LightGlue.download_weights(features)` once before starting them.
+To download them only once for multiple processes that share this cache (e.g. on a cluster), call `LightGlue.get_weights_path(features)` once before starting them.
