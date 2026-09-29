@@ -1,4 +1,3 @@
-import urllib.request
 import warnings
 from pathlib import Path
 from types import SimpleNamespace
@@ -421,14 +420,24 @@ class LightGlue(nn.Module):
 
         state_dict = None
         if features is not None:
-            weights_path = PRETRAINED_MODEL_WEIGHTS_PATH.joinpath(f"{conf.weights}.pth")
-            # Due to pypi.org size constraints, we cannot ship all weights in the package
-            # If we do not find the weights file in the package, we load it from the internet.
+            fname = f"{conf.weights}.pth"
+            weights_path = PRETRAINED_MODEL_WEIGHTS_PATH.joinpath(fname)
+            # Due to pypi.org size constraints, we cannot ship all weights in the
+            # package. Missing weights are downloaded into the torch hub cache
+            # (configurable via TORCH_HOME).
             if not weights_path.is_file():
-                weights_path.parent.mkdir(parents=True, exist_ok=True)
-                url = self.url.format(self.version, conf.weights)
-                print(f"Downloading weights from {url} ...")
-                urllib.request.urlretrieve(url, weights_path)
+                weights_path = Path(torch.hub.get_dir()).joinpath(
+                    "checkpoints", "scm_lightglue", self.version, fname
+                )
+                if not weights_path.is_file():
+                    weights_path.parent.mkdir(parents=True, exist_ok=True)
+                    url = self.url.format(self.version, conf.weights)
+                    print(f"Downloading weights from {url} ...")
+                    # Writes to a temporary file and renames it once complete, so that
+                    # concurrent processes never load a partially written file.
+                    torch.hub.download_url_to_file(
+                        url, str(weights_path), progress=False
+                    )
             state_dict = torch.load(weights_path)
             self.load_state_dict(state_dict, strict=False)
         elif conf.weights is not None:
