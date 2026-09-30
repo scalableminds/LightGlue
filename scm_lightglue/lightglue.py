@@ -1,4 +1,3 @@
-import urllib.request
 import warnings
 from pathlib import Path
 from types import SimpleNamespace
@@ -421,15 +420,7 @@ class LightGlue(nn.Module):
 
         state_dict = None
         if features is not None:
-            weights_path = PRETRAINED_MODEL_WEIGHTS_PATH.joinpath(f"{conf.weights}.pth")
-            # Due to pypi.org size constraints, we cannot ship all weights in the package
-            # If we do not find the weights file in the package, we load it from the internet.
-            if not weights_path.is_file():
-                weights_path.parent.mkdir(parents=True, exist_ok=True)
-                url = self.url.format(self.version, conf.weights)
-                print(f"Downloading weights from {url} ...")
-                urllib.request.urlretrieve(url, weights_path)
-            state_dict = torch.load(weights_path)
+            state_dict = torch.load(self.get_weights_path(features))
             self.load_state_dict(state_dict, strict=False)
         elif conf.weights is not None:
             path = Path(__file__).parent
@@ -447,6 +438,33 @@ class LightGlue(nn.Module):
 
         # static lengths LightGlue is compiled for (only used with torch.compile)
         self.static_lengths = None
+
+    @classmethod
+    def get_weights_path(cls, features: str) -> Path:
+        """Returns the path to the weights for `features`, downloading them if needed.
+
+        Call this once before starting multiple processes that share the torch hub
+        cache, so that missing weights are downloaded only once.
+        """
+        weights = cls.features[features]["weights"]
+        weights_path = Path(PRETRAINED_MODEL_WEIGHTS_PATH.joinpath(f"{weights}.pth"))
+        # Due to pypi.org size constraints, we cannot ship all weights in the
+        # package. Missing weights are downloaded into the torch hub cache
+        # (configurable via TORCH_HOME).
+        if weights_path.is_file():
+            return weights_path
+        weights_path = Path(torch.hub.get_dir()).joinpath(
+            "checkpoints", "scm_lightglue", cls.version, f"{weights}.pth"
+        )
+        if not weights_path.is_file():
+            weights_path.parent.mkdir(parents=True, exist_ok=True)
+            url = cls.url.format(cls.version, weights)
+            print(f"Downloading weights from {url} ...")
+            # download_url_to_file downloads into a temporary file and renames it to
+            # weights_path once complete, so concurrent processes may download in
+            # parallel but never load a partially written file.
+            torch.hub.download_url_to_file(url, str(weights_path), progress=False)
+        return weights_path
 
     def compile(
         self, mode="reduce-overhead", static_lengths=[256, 512, 768, 1024, 1280, 1536]
